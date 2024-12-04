@@ -20,16 +20,13 @@ export class Customer {
   email: string;
 
   @Prop({ required: true })
-  phone: string;
+  phoneNumber: string;
 
   @Prop({ required: true, enum: GenderEnum, type: String })
   gender: string;
 
   @Prop({ required: true })
   city: string;
-
-  @Prop({ required: true })
-  password: string;
 
   createdAt: Date;
 

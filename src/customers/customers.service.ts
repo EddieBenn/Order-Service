@@ -1,26 +1,75 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCustomerDto } from './dto/create-customer.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CreateCustomerDto, CustomerFilter } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Customer, CustomerDocument } from './schemas/customer.schema';
+import { Model } from 'mongoose';
+import { buildCustomerFilter } from 'src/common/filters/query.filter';
 
 @Injectable()
 export class CustomersService {
-  create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+  constructor(
+    @InjectModel(Customer.name)
+    private readonly customerModel: Model<CustomerDocument>,
+  ) {}
+
+  async createCustomer(body: CreateCustomerDto): Promise<Customer> {
+    const customer = new this.customerModel(body);
+    return await customer.save();
   }
 
-  findAll() {
-    return `This action returns all customers`;
+  async getAllCustomers(queryParams?: CustomerFilter) {
+    const page = queryParams?.page ? Number(queryParams.page) : 1;
+    const size = queryParams?.size ? Number(queryParams.size) : 10;
+    const skip = (page - 1) * size;
+    const query = await buildCustomerFilter(queryParams);
+
+    const customers = await this.customerModel
+      .find(query)
+      .skip(skip)
+      .limit(size)
+      .sort({ createdAt: -1 });
+    const count = await this.customerModel.countDocuments(query);
+
+    const totalPages = Math.ceil(count / size);
+
+    return {
+      customers,
+      pagination: {
+        totalRows: count,
+        perPage: size,
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  async updateCustomerById(
+    id: string,
+    data: UpdateCustomerDto,
+  ): Promise<Customer> {
+    const customer = await this.customerModel
+      .findByIdAndUpdate(id, { $set: data }, { new: true })
+      .exec();
+
+    if (!customer) {
+      throw new HttpException(
+        `Customer with id: ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return customer;
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  async deleteCustomerById(id: string): Promise<{ message: string }> {
+    const customer = await this.customerModel.findByIdAndDelete(id).exec();
+    if (!customer) {
+      throw new HttpException(
+        `customer with id: ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return { message: `Customer with id: ${id} successfully deleted` };
   }
 }
