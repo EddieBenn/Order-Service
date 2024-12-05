@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CustomersModule } from './customers/customers.module';
+import { OrdersModule } from './orders/orders.module';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ dotenv.config();
     MongooseModule.forRoot(process.env.MONGO_URI),
     ConfigModule,
     CustomersModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
