@@ -139,17 +139,17 @@ INVENTORY_BASE_URL = YOUR INVENTORY_BASE_URL
     </tr>
     <tr>
       <td>GET</td>
-      <td>/</td>
+      <td>/customers</td>
       <td>Get all customers</td>
     </tr>
     <tr>
       <td>PUT</td>
-      <td>/:id</td>
+      <td>/customers/:id</td>
       <td>Update customer</td>
     </tr>
     <tr>
       <td>DELETE</td>
-      <td>/:id</td>
+      <td>/customers/:id</td>
       <td>Delete customer</td>
     </tr>
   </tbody>
@@ -174,12 +174,12 @@ INVENTORY_BASE_URL = YOUR INVENTORY_BASE_URL
     </tr>
     <tr>
       <td>GET</td>
-      <td>/:id</td>
+      <td>/orders/:id</td>
       <td>Get one order</td>
     </tr>
     <tr>
       <td>DELETE</td>
-      <td>/:id</td>
+      <td>/orders/:id</td>
       <td>Delete order</td>
     </tr>
   </tbody>
