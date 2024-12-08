@@ -15,7 +15,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
       useFactory: (configService: ConfigService) => ({
         exchanges: [{ name: 'inventory_exchange', type: 'topic' }],
         uri: configService.get('RABBITMQ_URI'),
-        connectionInitOptions: { wait: true, timeout: 10000 },
+        connectionInitOptions: { wait: true, timeout: 20000 },
       }),
       inject: [ConfigService],
     }),
