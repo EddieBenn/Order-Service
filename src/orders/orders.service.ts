@@ -3,17 +3,49 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { Order, OrderDocument } from './schemas/order.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { checkStockAvailability, deductStock } from 'src/utils/axios';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name)
     private readonly orderModel: Model<OrderDocument>,
+    private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
   async createOrder(body: CreateOrderDto): Promise<Order> {
+    const { itemId, quantity } = body;
+
+    const stockAvailable = await checkStockAvailability(itemId, quantity);
+    if (!stockAvailable) {
+      throw new HttpException('Insufficient stock', HttpStatus.BAD_REQUEST);
+    }
+
     const order = new this.orderModel(body);
-    return await order.save();
+    const savedOrder = await order.save();
+    await deductStock(itemId, quantity);
+    return savedOrder;
+  }
+
+  @RabbitSubscribe({
+    exchange: 'inventory_exchange',
+    routingKey: 'stock.*',
+    queue: 'order_service_queue',
+  })
+  async handleStockEvent(message: any) {
+    console.log('Received stock event:', message);
+
+    await this.elasticsearchService.index({
+      index: 'stock-updates',
+      body: {
+        itemId: message.id,
+        name: message.name,
+        stock: message.stock,
+        timestamp: new Date(),
+      },
+    });
   }
 
   async getOrderById(id: string): Promise<Order> {

@@ -12,13 +12,22 @@ export class CreateOrderDto {
   itemId: string;
 
   @ApiProperty({
-    example: '20',
+    example: 20,
     description: 'Number of items to be order',
   })
   @IsNotEmpty()
   @Transform(({ value }) => Number(value))
   @IsNumber()
   quantity: number;
+
+  @ApiProperty({
+    example: 20000,
+    description: 'Total price of all the items ordered',
+  })
+  @IsNotEmpty()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  totalPrice: number;
 
   @ApiProperty({
     example: '6850c304bc6233143a7c8e42',
