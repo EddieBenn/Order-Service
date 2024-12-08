@@ -12,6 +12,9 @@ export class Order {
   quantity: number;
 
   @Prop({ required: true })
+  totalPrice: number;
+
+  @Prop({ required: true })
   customerId: string;
 
   createdAt: Date;
