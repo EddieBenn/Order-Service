@@ -1,0 +1,40 @@
+version: '3.8'
+
+networks:
+  app-network:
+    external: true
+
+services:
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order-service
+    restart: always
+    ports:
+      - '3008:3008'
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - RABBITMQ_URI=${RABBITMQ_URI}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    restart: always
+    ports:
+      - '9200:9200'
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+
+volumes:
+  es-data:
