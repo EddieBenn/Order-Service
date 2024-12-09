@@ -1,6 +1,6 @@
 # SmileMart(Order Service)
 
-[SmileMart-Order-Url](https://smilemart-inventory-service.onrender.com)
+[SmileMart-Order-Url](https://smilemart-order-service.onrender.com)
 
 ## Project Overview
 SmileMart(Order Service) is a core microservice in an E-commerce platform designed to manage customer orders. Built with **Node.js**, **NestJS**, **Docker**, **RabbitMQ**, **Elasticsearch**, **Mongoose**, and **MongoDB**, it follows Domain-Driven Design (DDD) principles. The service communicates with the Inventory microservice through event-based messaging using RabbitMQ. It ensures seamless order processing, real-time stock validation, and reliable logging of inventory updates. The application is containerized using Docker for easy deployment and scalability, with comprehensive API documentation accessible through Swagger by appending `/documentationView` to the base URL.
